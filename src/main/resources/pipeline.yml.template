@@ -1,0 +1,28 @@
+resources:
+- name: code
+  type: git
+  source:
+    uri: {{git_url}}
+    branch: master
+
+- name: pws
+  type: cf
+  source:
+    api: {{cf_api}}
+    username: {{cf_username}}
+    password: {{cf_password}}
+    organization: {{cf_org}}
+    space: {{cf_space}}
+    skip_cert_check: false
+
+jobs:
+- name: deploy
+  plan:
+  - get: code
+    trigger: true
+  - task: package
+    privileged: true
+    file: code/ci/tasks/package.yml
+  - put: pws
+    params:
+      manifest: build/manifest.yml

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e -x
+
+cd code/
+./mvnw package
+
+cp manifest.yml ../build/
+cp target/*.jar ../build/

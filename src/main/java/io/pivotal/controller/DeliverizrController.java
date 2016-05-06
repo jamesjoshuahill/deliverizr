@@ -1,5 +1,6 @@
 package io.pivotal.controller;
 
+import io.pivotal.domain.Cf;
 import io.pivotal.domain.Project;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.User;
@@ -8,10 +9,9 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RemoteAddCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
 
 @RestController
 public class DeliverizrController {
@@ -31,6 +30,9 @@ public class DeliverizrController {
     @Value("${github.password}")
     private String gitHubPassword;
 
+    @Autowired
+    private Cf cf;
+
     @RequestMapping(path = "/", method = RequestMethod.GET)
     public String index() {
         return "{}";
@@ -40,17 +42,20 @@ public class DeliverizrController {
     public String create(
             @RequestParam(value="project_name") String projectName
     ) throws IOException, GitAPIException, URISyntaxException {
-        Project project = new Project(projectName);
+        Project project = new Project(projectName, cf);
         project.generateCode();
+        project.generateManifest();
 
         GitHubClient client = new GitHubClient();
         client.setCredentials(gitHubUsername, gitHubPassword);
 
         RepositoryService service = new RepositoryService(client);
         Repository remoteRepo = service.createRepository(new Repository()
-                .setName(projectName)
-                .setOwner(new User().setLogin(client.getUser()))
+                        .setName(projectName)
+                        .setOwner(new User().setLogin(client.getUser()))
         );
+
+        project.generatePipeline(remoteRepo.getHtmlUrl());
 
         Git git = Git.init().setDirectory(project.getCodeRoot().toFile()).call();
         git.add().addFilepattern(".").call();
@@ -71,6 +76,8 @@ public class DeliverizrController {
                 .setCredentialsProvider(new UsernamePasswordCredentialsProvider(
                         gitHubUsername, gitHubPassword))
                 .setRemote("origin").call();
+
+        project.startPipeline();
 
         return "{\"project_name\":\"" + projectName + "\", \"git_https_url\":\"" + remoteRepo.getHtmlUrl() + "\", \"git_ssh_url\":\"" + remoteRepo.getSshUrl() + "\"}";
     }

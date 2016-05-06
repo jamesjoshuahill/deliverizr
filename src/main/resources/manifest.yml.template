@@ -1,0 +1,4 @@
+---
+applications:
+- name: {{project_name}}
+  path: {{project_name}}-0.0.1-SNAPSHOT.jar
