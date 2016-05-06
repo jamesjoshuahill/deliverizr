@@ -31,7 +31,7 @@ public class Project {
         script.toFile().setExecutable(true, true);
         System.out.println(script.toAbsolutePath().toString());
 
-        final String basePath = "project";
+        final String basePath = name;
 
         String template = ResourceUtils.getResourceString("scriptTemplate.sh");
         template = substitute(template, new ImmutableMap.Builder<String,String>( )

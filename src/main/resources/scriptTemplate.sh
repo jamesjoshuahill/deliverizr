@@ -3,4 +3,4 @@
 set -e -x
 
 cd "{{tempdir}}"
-spring init {{basepath}} --dependencies=web -build=maven
+spring init --dependencies=web -build=maven {{basepath}}
