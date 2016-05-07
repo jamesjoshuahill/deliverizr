@@ -26,12 +26,7 @@ vagrant up
 Concourse CLI
 ```
 open http://192.168.100.4:8080
-```
-Download the `fly` binary from Concourse Lite, by clicking on the Apple icon.
-
-Then make it executable and put it in your `$PATH`, for example:
-
-```
+# Click the Apple icon to download `fly`
 install ~/Downloads/fly /usr/local/bin/fly
 ```
 
@@ -48,6 +43,8 @@ export CF_ORG=REPLACE_CF_ORG_NAME
 export CF_SPACE=REPLACE_WITH_CF_SPACE_NAME
 ```
 
+NB: If you have enabled two-factor on your GitHub account you will need to use a personal access token as the password. This will need the `public_repo` scope to create repos.
+
 If you use `direnv` then a `.envrc.example` is provided for convenience.
 
 ## Run
@@ -59,7 +56,7 @@ If you use `direnv` then a `.envrc.example` is provided for convenience.
 ## Deliverize a new Spring Boot app
 
 ```
-curl -X POST localhost:8080?project_name=test42
+curl -X POST localhost:8080?project_name=REPLACE_WITH_PROJECT_NAME
 ```
 
 This will:
