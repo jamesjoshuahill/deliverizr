@@ -2,9 +2,7 @@
 
 A hack day project by Alex Blease, David Evans and Josh Hill.
 
-## Local development
-
-### Prerequisites
+## Prerequisites
 
 Java 8 SDK
 ```
